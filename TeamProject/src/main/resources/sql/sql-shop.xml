@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitc.mapper.ShopMapper">
+	<!--메인 화면 카테고리-->
+	<select id="selectMain" resultType="com.bitc.dto.KategorieDto">
+		<![CDATA[ 
+			SELECT
+				kate
+			FROM
+				t_kategorie
+		]]>
+	</select>
+	
+	<!--가게 목록-->
+	<select id="selectShopList" parameterType="String" resultType="com.bitc.dto.ShopDto">
+		<![CDATA[
+			SELECT
+				shop_pk, shop_name, shop_detail, shop_image
+			FROM
+				t_shop
+			WHERE
+				shop_kate = #{shopKate}
+		]]>
+	</select>
+
+	<!--검색창 - 음식명-->
+	<select id="search2" parameterType="com.bitc.dto.OrderDto" resultType="com.bitc.dto.OrderDto">
+		<![CDATA[ 
+			SELECT 
+				no, shop_name, shop_menu, shop_Mprice, deleted_yn, shop_pk, completed_yn, shop_Mdetail, menu_image
+			FROM
+				t_order_detail
+			WHERE 
+				shop_menu LIKE CONCAT('%',#{shopMenu},'%') 
+		]]>
+	</select>
+</mapper>

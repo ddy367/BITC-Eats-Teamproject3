@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitc.mapper.AccountMapper"> 
+
+	<!-- 아이디 권한 체크 -->
+	<select id="idAuthorityChk" resultType="int" parameterType="com.bitc.dto.AccountDto">
+		<![CDATA[ 
+			SELECT 
+				COUNT(*) 
+			FROM 
+				user 
+			WHERE 
+				user_id = #{userId} 
+			AND
+				user_authority = #{userAuthority} 
+		]]>
+	</select>
+	
+	<!-- 아이디 unique key 체크 -->
+	<select id="idUniqChk" resultType="int" parameterType="com.bitc.dto.AccountDto">
+		<![CDATA[ 
+			SELECT 
+				COUNT(*) 
+			FROM 
+				user 
+			WHERE 
+				user_id = #{userId} 
+		]]>
+	</select>
+	
+	<!-- 회원 등록 -->
+	<insert id="userRegister" parameterType="com.bitc.dto.AccountDto">
+		<![CDATA[ 
+			INSERT INTO 
+				user (user_id, user_pw, user_nick, user_phone, user_addr, user_authority) 
+			VALUES 
+				(#{userId}, #{userPw}, #{userNick}, #{userPhone}, #{userAddr}, #{userAuthority}) 
+				
+		]]>
+	</insert>
+	
+	<!-- 로그인 확인 -->
+	<select id="selectUserInfoYn" parameterType="map" resultType="String">
+		<![CDATA[ 
+			SELECT
+				user_pw 
+			FROM
+				user 
+			WHERE
+				user_id = #{userId} 
+				
+		]]>
+	</select>
+	
+	<!-- 마이페이지 정보 -->
+	<select id="userDetail" parameterType="String" resultType="com.bitc.dto.AccountDto">
+		<![CDATA[ 
+			SELECT 
+				user_id, user_nick, user_phone, user_addr 
+			FROM 
+				user 
+			WHERE
+				user_id = #{userId} 
+		]]>
+	</select>
+	
+	<!-- 유저정보 수정 -->
+	<update id="editUser" parameterType="com.bitc.dto.AccountDto">
+		<![CDATA[ 
+			UPDATE 
+				user
+			SET 
+				user_nick = #{userNick}, 
+				user_phone = #{userPhone}, 
+				user_addr = #{userAddr} 
+			WHERE
+				user_id = #{userId} 
+		]]>
+	</update>
+	
+	<!-- 유저 비밀번호 수정 -->
+	<update id="editPw" parameterType="com.bitc.dto.AccountDto">
+		<![CDATA[ 
+			UPDATE
+				user
+			SET
+				user_pw = #{userPw}
+			WHERE
+				user_id = #{userId}
+		]]>
+	</update>
+</mapper>

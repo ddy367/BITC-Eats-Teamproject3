@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</head>
+<body>
+	<header>
+		<div class="container">
+			<nav class="navbar navbar-expand-sm navbar-light px-5" style=" background:#f0f0f5;">
+				<a href="#" class="navbar-brand text-muted">T3</a>
+				<!-- 로그인시 없어짐, 비로그인시 생김 -->
+				<div class="ms-auto">
+					<a th:if="${session.userId} == null" href="/login" style="text-decoration:none" class="pe-3">로그인</a>
+					<a th:if="${session.userId} != null" href="/logout" style="text-decoration:none">로그아웃</a>
+					<a th:if="${session.userId} == null" href="/join" style="text-decoration:none">회원가입</a>
+				</div>
+			</nav>
+			<nav class="navbar navbar-light border-bottom px-5">
+			  <div class="container-fluid">
+			    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+			      <span class="navbar-toggler-icon"></span>
+			    </button>
+			    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+			      <div class="offcanvas-header">
+			        <h5 class="offcanvas-title ps-5" id="offcanvasNavbarLabel">카테고리</h5>
+			        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			      </div>
+			      <div class="offcanvas-body">
+				       <ul class="navbar-nav justify-content-end flex-grow-1 ps-5">
+				          <li class="nav-item">
+				          		<a class="nav-link active" aria-current="page" href="#">Home</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="#">한식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="#">양식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="#">일식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="#">중식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="#">야식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="#">디저트</a>
+				          </li>
+			        	</ul>
+			    	</div>
+			    </div>
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a href="#" class="nav-link text-muted active ms-3"><h2>카테고리</h2></a>
+					</li>
+				</ul>
+				<div>
+					<form>
+					    <div class="input-group">
+					      <span class="input-group-text" id="search" style=" background:#0099ff; border-radius: 20px 0px 0px 20px;"><img src="c:/image/main/search.png" th:src="@{/main/search.png}"  style="width: 40px; height: 30px;"></span>
+					      <input size=70 type="text" class="form-control" placeholder="검색어를 입력하세요" aria-label="search" aria-describedby="search" style="border-radius: 0px 20px 20px 0px; border-color: #0099ff;">
+					    </div>
+					</form>
+				</div>
+				<!-- 로그인시 생겨남, 비로그인시 없어짐 -->
+				<div class="ms-auto" th:if="${session.userId} != null">
+					<div class="p-3">
+						<a href="/myPage"><img src="c:/image/main/user.png" th:src="@{/main/user.png}" style="width: 50px; height: 50px;" ></a>
+						<a href="#"><img src="c:/image/main/cart.png" th:src="@{/main/cart.png}" style="width: 50px; height: 50px;" class="ms-4"></a>
+					</div>
+					<div>
+						<a href="/myPage" style="text-decoration:none" class="pe-3">마이페이지</a>
+						<a href="#" style="text-decoration:none">장바구니</a>
+					</div>
+				</div>
+			</div>
+			</nav>	
+		</div>	
+	</header>
+</body>
+</html>
+
+
+

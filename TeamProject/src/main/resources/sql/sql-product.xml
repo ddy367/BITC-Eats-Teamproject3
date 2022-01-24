@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitc.mapper.ProductMapper"> 
+
+	<!-- 메뉴 리스트 -->
+	<select id="selectMenuList" resultType="com.bitc.dto.ProductDto">
+		<![CDATA[
+			SELECT
+				shop_pk, shop_menu, shop_Mprice, shop_Mdetail
+			FROM
+				t_shop
+			WHERE
+				deleted_yn = 'N'
+			ORDER BY
+				shop_pk DESC
+		]]>
+	</select>
+
+	<!-- 장바구니 리스트 -->	
+	<select id="selectBasketList" resultType="com.bitc.dto.ProductDto">
+		<![CDATA[
+			SELECT
+				no, shop_name, shop_menu, shop_Mprice
+			FROM
+				t_order_detail
+			WHERE
+				deleted_yn = 'N' and completed_yn = 'N'
+			ORDER BY
+				no DESC
+		]]>
+	</select>
+	
+	<!-- 메뉴 페이징 소스 -->
+	<select id="selectMenuPageList" parameterType="String" resultType="com.bitc.dto.ProductDto">
+		<![CDATA[
+			SELECT
+				shop_pk, shop_menu, shop_Mprice, shop_Mdetail, no, menu_image
+			FROM
+				t_order_detail
+			WHERE
+				deleted_yn = 'N'
+			AND
+				shop_name = #{shopName}
+			ORDER BY
+				shop_pk DESC
+		]]>
+	</select>
+	
+	<!-- 장바구니 페이징 소스 -->
+	<select id="selectBasketPageList" resultType="com.bitc.dto.ProductDto">
+		<![CDATA[
+			SELECT
+				no, shop_name, shop_menu, shop_Mprice, menu_image
+			FROM
+				t_basket
+			WHERE
+				deleted_yn = 'N' and completed_yn = 'N'
+			ORDER BY
+				no DESC
+		]]>
+	</select>
+	
+	<!-- 메뉴->장바구니 담기 -->
+	<insert id="insertMenu" parameterType="com.bitc.dto.ProductDto" useGeneratedKeys="true" keyProperty="no">
+		<![CDATA[
+			INSERT INTO 
+				t_basket(no, shop_name, shop_menu, shop_Mprice, menu_image)	
+			SELECT
+				no, shop_name, shop_menu, shop_Mprice, menu_image
+			FROM
+				t_order_detail
+			WHERE
+				no = #{no}
+		]]>
+	</insert>
+	
+	<!-- 장바구니에서 메뉴 삭제 -->
+	<update id="deleteMenu" parameterType="int">
+		<![CDATA[
+			UPDATE
+				t_basket
+			SET
+				deleted_yn = 'Y'
+			WHERE
+				no = #{no}
+		]]>
+	</update>
+	
+	<!-- 주문 제품 리스트 -->
+	<select id="selectPriceList" resultType="com.bitc.dto.ProductDto">
+		<![CDATA[
+			SELECT
+				no, shop_menu, shop_Mprice
+			FROM
+				t_basket
+			WHERE
+				deleted_yn = 'N' and completed_yn = 'N'
+			ORDER BY
+				no DESC
+		]]>
+	</select>
+	
+	<!-- 계산완료 후 장바구니 비우기 -->
+	<update id="clearBasket" parameterType="int">
+		<![CDATA[
+			UPDATE
+				t_basket
+			SET
+				deleted_yn = 'Y', completed_yn = 'Y'
+			WHERE
+				no = #{no}
+		]]>
+	</update>
+</mapper>

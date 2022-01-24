@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {	
+	$("#search2").keypress(function(event){
+		if(event.which == 13) {
+			$("#search1").click();
+			return false;
+		}
+	});
+	
+	$("#search1").on("click", function() {
+		var search2 = $.trim($("#search2").val());
+	
+ 	 	/* 검색창 */
+		$.ajax({
+			url: "/ajax/search2",
+			type : "post",
+			data: {shopMenu : search2},
+			success: function(data) {
+				
+				/* Menu List 타이틀 바뀜 */
+				var kate = $("#title");		
+				
+				kate.empty();
+				
+				var str = '<h1>Menu List</h1>';
+
+				kate.append(str);
+				
+				/* 검색창 */
+				var cards = $("#items");
+				
+				cards.empty();
+				
+				for (var i = 0; i < data.length; i++) {
+		               var str = '<div class="card">';
+		               str += '<div class="row my-5 ms-3">';
+		               str += '<div class="col-sm-4 text-center">';
+		               str += '<a href="/menu/'+ data[i].shopName +'"><img src=' + data[i].menuImage + ' class="rounded-circle me-5" style="width: 120px; height: 120px;"></a>';
+		               str += '</div>';
+		               str += '<div class="col-sm-7">';
+		               str += '<div>';
+		               str += '<div>';    
+		               str += '<div class="card-body">';
+		               str += '<h2 class="card-title">' + data[i].shopMenu +'</h2>';
+		               str += '<p class="card-text">' + data[i].shopMdetail +'</p>';
+		               str += '<p class="card-text">' + data[i].shopMprice +'원</p>';
+		               str += '</div></div></div></div></div></div>';
+		               
+		               cards.append(str);
+		            }							
+	
+			}, error: function() {
+				alert("통신 실패");				
+			}
+		}); 
+	});
+});
+</script>
+
+</head>
+<body>
+	<header>
+		<!-- 네비게이션 1-->
+		<div class="container">
+			<nav class="navbar navbar-expand-sm navbar-light px-5" style=" background:#f0f0f5;">
+				<a href="/main" class="navbar-brand text-muted">T3</a>
+				<div class="ms-auto">
+					<a th:if="${session.userId} == null" href="/login" style="text-decoration:none" class="pe-3">로그인</a>
+					<a th:if="${session.userId} != null" href="/logout" style="text-decoration:none">로그아웃</a>
+					<a th:if="${session.userId} == null" href="/join" style="text-decoration:none">회원가입</a>
+				</div>
+			</nav>
+			<!-- 네비게이션 2 -->
+			<!-- offcanvas -->
+			<nav class="navbar navbar-light border-bottom px-5">
+			  <div class="container-fluid">
+			    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+			      <span class="navbar-toggler-icon"></span>
+			    </button>
+			    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+			      <div class="offcanvas-header">
+			        <h5 class="offcanvas-title ps-5" id="offcanvasNavbarLabel">카테고리</h5>
+			        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			      </div>
+			      <div class="offcanvas-body">
+				       <ul class="navbar-nav justify-content-end flex-grow-1 ps-5">
+				          <li class="nav-item">
+				          		<a class="nav-link active" aria-current="page" href="/main">Home</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/ko">한식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/we">양식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/jp">일식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/ch">중식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/snack">야식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/de">디저트</a>
+				          </li>
+			        	</ul>
+			    	</div>
+			    </div>
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<h2><a href="/main" class="nav-link text-muted active ms-3">TEAM3</a></h2>
+					</li>
+				</ul>
+				<!-- 검색창 -->
+				<div>
+					<form name="form-search" method="get" action="#">
+					    <div class="input-group">
+					    	<!-- submit->button -->				     
+					    	<input type="button" name="search1" id="search1" class="btn btn-search text-white" value="Q" style=" background:#0099ff; border-radius: 20px 0px 0px 20px;">	     
+					    	<input size=70 type="text" name="search2" id="search2" class="form-control" placeholder="검색어를 입력하세요" aria-label="search" aria-describedby="search" style="border-radius: 0px 20px 20px 0px; border-color: #0099ff;">
+					    </div>
+					</form>
+				</div>
+				<!-- 마이페이지, 장바구니 -->
+				<div class="ms-auto" th:if="${session.userId} != null">
+					<div class="p-3">
+						<a href="/myPage"><img src="c:/image/main/user.png" th:src="@{/main/user.png}" style="width: 50px; height: 50px;" class="me-2" ></a>
+						<a href="/basketPaging"><img src="c:/image/main/cart.png" th:src="@{/main/cart.png}" style="width: 50px; height: 50px;" class="ms-4"></a>
+					</div>
+					<div>
+						<a href="/myPage" style="text-decoration:none" class="pe-3">마이페이지</a>
+						<a href="/basketPaging" style="text-decoration:none">장바구니</a>
+					</div>
+				</div>
+				<div class="ms-auto" th:unless="${session.userId} != null">
+				</div>
+			</div>
+			</nav>	
+		</div>	
+	</header>
+	
+	<main>
+		<!-- carousel -->
+		<div class="container">
+			<div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+			  <div class="carousel-inner">
+			    <div class="carousel-item active">
+			      <img src="c:/image/carousel/carousel1.jpg" th:src="@{/carousel/carousel1.jpg}" class="d-block w-100" style="height: 450px;" alt="carousel1">
+			    </div>
+			    <div class="carousel-item">
+			      <img src="c:/image/carousel/carousel2.jpg" th:src="@{/carousel/carousel2.jpg}" class="d-block w-100" style="height: 450px;" alt="carousel2">
+			    </div>
+			    <div class="carousel-item">
+			      <img src="c:/image/carousel/carousel3.jpg" th:src="@{/carousel/carousel3.jpg}" class="d-block w-100" style="height: 450px;" alt="carousel3">
+			    </div>
+			    <div class="carousel-item">
+			      <img src="c:/image/carousel/carousel4.jpg" th:src="@{/carousel/carousel4.jpg}" class="d-block w-100" style="height: 450px;" alt="carousel4">
+			    </div>
+			    <div class="carousel-item">
+			      <img src="c:/image/carousel/carousel5.jpg" th:src="@{/carousel/carousel5.jpg}" class="d-block w-100" style="height: 450px;" alt="carousel5">
+			    </div>
+			  </div>
+			  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+			    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			    <span class="visually-hidden">Previous</span>
+			  </button>
+			  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+			    <span class="carousel-control-next-icon" aria-hidden="true"></span>  
+			    <span class="visually-hidden">Next</span>
+			  </button>
+			</div>
+			<!-- 카테고리 -->
+			<div class="mt-2 p-3">
+				<div id="title" class="border-top border-bottom my-3 ps-3 py-2 text-muted" style=" background:#f0f0f5;">
+					<h1>Kategorie</h1>
+				</div>				
+				<div id="items" class="border mx-auto shadow p-3 mb-5 bg-white rounded" style="border-radius: 40px;">		
+					<div class="row my-5 mx-5">
+						<div class="col-sm">
+							<a href="/shopList/ko" class="text-decoration-none">
+								<label></label>
+								<img src="c:/image/kategorie/koFood.jpg" th:src="@{/kategorie/koFood.jpg}" class="rounded-circle me-5" style="width: 250px; height: 250px;">							
+							</a>
+							<h4 class="text-center pe-5 me-5 mt-2">한식</h4>
+						</div>
+						<div class="col-sm">
+							<a href="/shopList/we" class="text-decoration-none">
+								<label></label>
+								<img src="c:/image/kategorie/weFood.jpg" th:src="@{/kategorie/weFood.jpg}" class="rounded-circle me-5" style="width: 250px; height: 250px;">
+							</a>
+							<h4 class="text-center pe-5 me-5 mt-2">양식</h4>
+						</div>
+						<div class="col-sm">
+							<a href="/shopList/jp" class="text-decoration-none">
+								<label></label>
+								<img src="c:/image/kategorie/jpFood.jpg" th:src="@{/kategorie/jpFood.jpg}" class="rounded-circle me-5" style="width: 250px; height: 250px;">
+							</a>
+							<h4 class="text-center pe-5 me-5 mt-2">일식</h4>
+						</div>
+					</div>				
+					<div class="row  my-5 mx-5">
+						<div class="col-sm">
+							<a href="/shopList/ch" class="text-decoration-none">
+								<label></label>
+								<img src="c:/image/kategorie/chFood.jpg" th:src="@{/kategorie/chFood.jpg}" class="rounded-circle me-5" style="width: 250px; height: 250px;">
+							</a>
+							<h4 class="text-center pe-5 me-5 mt-2">중식</h4>
+						</div>
+						<div class="col-sm">
+							<a href="/shopList/snack" class="text-decoration-none">
+								<label></label>
+								<img src="c:/image/kategorie/snack.jfif" th:src="@{/kategorie/snack.jfif}" class="rounded-circle me-5" style="width: 250px; height: 250px;">
+							</a>
+							<h4 class="text-center pe-5 me-5 mt-2">야식</h4>
+						</div>
+						<div class="col-sm">
+							<a href="/shopList/de" class="text-decoration-none">
+								<label></label>
+								<img src="c:/image/kategorie/de.jfif" th:src="@{/kategorie/de.jfif}" class="rounded-circle me-5" style="width: 250px; height: 250px;">
+							</a>
+							<h4 class="text-center pe-5 me-5 mt-2">디저트</h4>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	
+	<footer th:replace="layout/footer :: footer"></footer>
+</body>
+</html>

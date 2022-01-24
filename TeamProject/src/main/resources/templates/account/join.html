@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+$(document).ready(function() {
+	
+	var count=1;
+	var author =$("#authority-u").val();
+	
+	$("#authority-u").on("click", function() {
+		author =$("#authority-u").val();
+	});
+	
+	$("#authority-m").on("click", function() {
+		author =$("#authority-m").val();
+	});
+	
+//	아이디 중복체크, 성공시 readonly 추가
+	$("#btn-overlap").on("click", function() {
+		var id = $.trim($("#user-id").val());
+		
+		if (id == "") {
+			alert("아이디를 입력해주세요");
+		} else {
+			$.ajax({
+				url: "/join/idOverlap",
+				method: "post",
+				data: {userId: id, userAuthority: author},
+				success: function(data) {
+					if(data == 0) {
+						alert("사용할 수 있는 아이디 입니다.");
+						$("#user-id").prop("readonly", true);
+						count = 0;
+					} else if (data == 1) {
+						alert("이미 사용중인 아이디 입니다.");
+						count = 1;
+					}
+				}, error: function() {
+					alert("DB연결이 필요합니다");
+					// 사용 원할시 아래 주석 해제
+					//count = 0;
+				}
+				
+			});
+		}
+		
+	});
+	
+	$("#btn-back").on("click", function() {
+		location.href="/login";
+	});
+	
+//	가입
+	$("#btn-submit").on("click", function() {
+//		전달값 확인
+/*		var id = $("#user-id").val();
+		var pw1 = $("#user-pw1").val();
+		var pw2 = $("#user-pw2").val();
+		var name = $("#user-nick").val();
+		var addr = $("#user-addr").val();
+		var phone = $("#user-phone").val();
+		var author1 = author;
+		alert("띵동"); */
+		
+		var id = $("#user-id").val();
+		var pw1 = $("#user-pw1").val();
+		var pw2 = $("#user-pw2").val();
+		var nick = $("#user-nick").val();
+		var phone = $("#user-phone").val();
+		var addr = $("#user-addr").val();
+		
+		
+		if(id =="" || pw1 == "" || pw2 =="") {
+			alert("필수정보를 모두 입력해주세요");
+		} else if(pw1 != pw2) {
+			alert("비밀번호가 일치하지 않습니다.");
+		} else if(count==1) {
+			alert("아이디 중복체크가 필요합니다.");
+		} else {
+			// 실행문
+			$.ajax({
+				url: "/join/register",
+				method: "post",
+				data:JSON.stringify({ userId: id, userPw: pw2,
+										userNick: nick, userPhone: phone, 
+										userAddr: addr, userAuthority: author }),
+				contentType: "application/json; charset=UTF-8",
+				success: function(data) {
+					alert("회원가입에 성공했습니다.");
+					location.href="/login";
+				}, error: function() {
+					alert("실패했습니다");
+				}
+			});
+		}
+	});
+});
+</script>
+
+</head>
+<body>
+	<header>
+		<!-- 네비게이션 1-->
+		<div class="container">
+			<nav class="navbar navbar-expand-sm navbar-light px-5" style=" background:#f0f0f5;">
+				<a href="/main" class="navbar-brand text-muted">T3</a>
+				<div class="ms-auto">
+					<a href="/login" style="text-decoration:none" class="pe-3">로그인</a>
+				</div>
+			</nav>
+			<!-- 네비게이션 2 -->
+			<!-- offcanvas -->
+			<nav class="navbar navbar-light border-bottom px-5">
+				<div class="container-fluid">
+					<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+					<span class="navbar-toggler-icon"></span>
+					</button>
+				<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+					<div class="offcanvas-header">
+						<h5 class="offcanvas-title ps-5" id="offcanvasNavbarLabel">카테고리</h5>
+						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+					</div>
+					<div class="offcanvas-body">
+						<ul class="navbar-nav justify-content-end flex-grow-1 ps-5">
+							<li class="nav-item">
+								<a class="nav-link active" aria-current="page" href="/main">Home</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/shopList/ko">한식</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/shopList/we">양식</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/shopList/jp">일식</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/shopList/ch">중식</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/shopList/snack">야식</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/shopList/de">디저트</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<h2><a href="/main" class="nav-link text-muted active ms-3 pt-2">TEAM3</a></h2>
+					</li>
+				</ul>
+			</div>
+			</nav>	
+		</div>	
+	</header>
+	
+	<main class="container py-5">
+		<div class="row my-5">
+			<div class="col-sm-5 mx-auto">
+				<h2 class="my-3">회원가입</h2>
+				<form>
+					<div class="row my-2">
+						<div class="col-sm-3">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="authority" id="authority-u" checked th:value="user">
+								<label class="form-check-label" for="authority">사용자</label>
+							</div>
+						</div>
+						<div class="col-sm-3">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="authority" id="authority-m" th:value="manager">
+								<label class="form-check-label" for="authority">사업자</label>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm">
+							<div class="row my-2">
+								<div class="col-sm-9">
+									<div class="form-floating">
+										<input type="text" id="user-id" name="userId" placeholder="아이디" class="form-control">
+										<label for="user-id" class="form-label">아이디 <span style="color:red">*</span></label>
+									</div>
+								</div>
+									<div class="col-sm-3 d-grid">
+										<button class="btn btn-secondary" id="btn-overlap" name="overlap" type="button">중복체크</button>
+									</div>
+							</div>
+							<div class="form-floating my-2">
+								<input type="password" class="form-control" id="user-pw1" name="userPw1" placeholder="비밀번호">
+								<label for="user-pw1" class="form-label">비밀번호 <span style="color:red">*</span></label>
+							</div>
+							<div class="form-floating my-2">
+								<input type="password" class="form-control" id="user-pw2" name="userPw" placeholder="비밀번호 확인">
+								<label for="user-pw2" class="form-label">비밀번호 확인 <span style="color:red">*</span></label>
+							</div>
+							<div class="form-floating my-2">
+								<input type="text" class="form-control" id="user-nick" name="userNick" placeholder="닉네임">
+								<label for="user-nick" class="form-label">닉네임</label>
+							</div>
+							<div class="form-floating my-2">
+								<input type="text" class="form-control" id="user-phone" name="userPhone" placeholder="전화번호">
+								<label for="user-phone" class="form-label">전화번호</label>
+							</div>
+							<div class="form-floating my-2">
+								<input type="text" class="form-control" id="user-addr" name="userAddr" placeholder="주소">
+								<label for="user-addr" class="form-label">주소</label>
+							</div>
+						</div>
+					</div>
+					<div class="row my-2">
+						<!-- 나중에 form태그 및 button타입 수정 필요 -->
+						<div class="col-sm-6 d-grid">
+							<button class="btn btn-lg btn-secondary" id="btn-back" type="button">뒤로</button>
+						</div>
+						<div class="col-sm-6 d-grid">
+							<button class="btn btn-lg btn-primary" id="btn-submit" type="button">Join In</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	
+<footer th:replace="layout/footer :: footer"></footer>	
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {	
+	$("#search2").keypress(function(event){
+		if(event.which == 13) {
+			$("#search1").click();
+			return false;
+		}
+	});
+	
+	$("#search1").on("click", function() {
+		var search2 = $.trim($("#search2").val());
+	
+ 	 	/* 검색창 */
+		$.ajax({
+			url: "/ajax/search2",
+			type : "post",
+			data: {shopMenu : search2},
+			success: function(data) {
+				
+				/* Menu List 타이틀 바뀜 */
+				var kate = $("#title");		
+				
+				kate.empty();
+				
+				var str = '<h1>Menu List</h1>';
+
+				kate.append(str);
+
+				/* 검색창 */
+				$("#shop-list").addClass("d-none");
+				$("#menu-list").removeClass("d-none");
+				
+				
+				var cards = $("#items");
+				
+				cards.empty();
+				
+				for (var i = 0; i < data.length; i++) {
+		               var str = '<div class="card">';
+		               str += '<div class="row my-5 ms-3">';
+		               str += '<div class="col-sm-4 text-center">';
+		               str += '<a href="/menu/'+ data[i].shopName +'"><img src=' + data[i].menuImage + ' class="rounded-circle me-5" style="width: 120px; height: 120px;"></a>';
+		               str += '</div>';
+		               str += '<div class="col-sm-7">';
+		               str += '<div>';
+		               str += '<div>';    
+		               str += '<div class="card-body">';
+		               str += '<h2 class="card-title">' + data[i].shopMenu +'</h2>';
+		               str += '<p class="card-text">' + data[i].shopMdetail +'</p>';
+		               str += '<p class="card-text">' + data[i].shopMprice +'원</p>';
+		               str += '</div></div></div></div></div></div>';
+		               
+		               cards.append(str);
+		            }		
+	
+			}, error: function() {
+				alert("통신 실패");				
+			}
+		}); 
+	});
+});
+</script>
+
+</head>
+<body>
+	<header>
+		<!-- 네비게이션-->
+		<div class="container">
+			<nav class="navbar navbar-expand-sm navbar-light px-5" style=" background:#f0f0f5;">
+				<a href="/main" class="navbar-brand text-muted">T3</a>
+				<div class="ms-auto">
+					<a th:if="${session.userId} == null" href="/login" style="text-decoration:none" class="pe-3">로그인</a>
+					<a th:if="${session.userId} != null" href="/logout" style="text-decoration:none">로그아웃</a>
+					<a th:if="${session.userId} == null" href="/join" style="text-decoration:none">회원가입</a>
+				</div>
+			</nav>
+			<!-- 네비게이션 2 -->
+			<!-- offcanvas -->
+			<nav class="navbar navbar-light border-bottom px-5">
+			  <div class="container-fluid">
+			    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+			      <span class="navbar-toggler-icon"></span>
+			    </button>
+			    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+			      <div class="offcanvas-header">
+			        <h5 class="offcanvas-title ps-5" id="offcanvasNavbarLabel">카테고리</h5>
+			        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			      </div>
+			      <div class="offcanvas-body">
+				       <ul class="navbar-nav justify-content-end flex-grow-1 ps-5">
+				          <li class="nav-item">
+				          		<a class="nav-link active" aria-current="page" href="/main">Home</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/ko">한식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/we">양식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/jp">일식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/ch">중식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/snack">야식</a>
+				          </li>
+				          <li class="nav-item">
+				            <a class="nav-link" href="/shopList/de">디저트</a>
+				          </li>
+			        	</ul>
+			    	</div>
+			    </div>
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<h2><a href="/main" class="nav-link text-muted active ms-3">TEAM3</a></h2>
+					</li>
+				</ul>
+				<!-- 검색창 -->
+				<div>
+					<form name="form-search" method="get" action="#">
+					    <div class="input-group" style="">				     
+					    	<input type="submit" name="search1" id="search1" class="btn btn-search text-white" value="Q" style=" background:#0099ff; border-radius: 20px 0px 0px 20px;">	     
+					    	<input size=70 type="text" name="search2" id="search2" class="form-control" placeholder="검색어를 입력하세요" aria-label="search" aria-describedby="search" style="border-radius: 0px 20px 20px 0px; border-color: #0099ff;">
+					    </div>
+					</form>
+				</div>
+				<!-- 마이페이지, 장바구니 -->
+				<div class="ms-auto" th:if="${session.userId} != null">
+					<div class="p-3">
+						<a href="/myPage"><img src="c:/image/main/user.png" th:src="@{/main/user.png}" style="width: 50px; height: 50px;" class="me-2" ></a>
+						<a href="/basketPaging"><img src="c:/image/main/cart.png" th:src="@{/main/cart.png}" style="width: 50px; height: 50px;" class="ms-4"></a>
+					</div>
+					<div>
+						<a href="/myPage" style="text-decoration:none" class="pe-3">마이페이지</a>
+						<a href="/basketPaging" style="text-decoration:none">장바구니</a>
+					</div>
+				</div>
+				<div class="ms-auto" th:unless="${session.userId} != null">
+				</div>
+			</div>
+			</nav>	
+		</div>	
+	</header>
+	
+	<main>
+		<!-- 가게 목록 -->
+		<div class="container">
+			<div class="mt-2 p-5">
+				<!-- 가게 이름 -->
+				<div id="title" class="border-top border-bottom my-3 ps-3 py-2 text-muted text-center" style=" background:#f0f0f5;">
+					<div th:if="${shopKate.equals('ko')}">
+						<h1>한식</h1>
+					</div>
+					<div th:if="${shopKate.equals('we')}">
+						<h1>양식</h1>
+					</div>
+					<div th:if="${shopKate.equals('jp')}">
+						<h1>일식</h1>
+					</div>
+					<div th:if="${shopKate.equals('ch')}">
+						<h1>중식</h1>
+					</div>
+					<div th:if="${shopKate.equals('snack')}">
+						<h1>야식</h1>
+					</div>
+					<div th:if="${shopKate.equals('de')}">
+						<h1>디저트</h1>
+					</div>
+				</div>
+				<div class="border p-5 shadow p-3 mb-5 bg-white rounded" style="border-radius: 40px;">
+					<form id="items">
+						<div class="card" th:if="${#lists.size(shopList)} > 0" th:each="list : ${shopList}">
+							<div class="row my-5 ms-3">
+								<div class="col-sm-4 text-center">
+									<a href="/menu/" th:attrappend="href=${list.shopName}"><img th:src="@{${list.shopImage}}" class="rounded-circle me-5" style="width: 120px; height: 120px;"></a>
+								</div>
+								<div class="col-sm-7">
+									<div>
+										<div class="card-body">
+											<div id="shop-list" class="">
+												<h2 class="card-title" id="name" th:text="${list.shopName}"></h2>
+												<p class="card-text" id="detail" th:text="${list.shopDetail}"></p>
+											</div>										
+											<div id="menu-list" class="d-none">
+												<h2 class="card-title" id="name" th:text="${list.shopMenu}"></h2>
+												<p class="card-text" id="detail" th:text="${list.shopMdetail}"></p>										
+												<p class="card-text" id="detail" th:text="${list.shopMprice}"></p>										
+											</div>
+										</div>
+										<div th:unless="${#lists.size(shopList)} > 0">
+											<p>내용이 없습니다</p>
+										</div>
+									</div>
+								</div>				
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</main>
+	
+	<footer th:replace="layout/footer :: footer"></footer>
+</body>
+</html>
