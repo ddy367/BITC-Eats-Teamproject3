@@ -1,1 +1,2 @@
-# Teamproject3
+#BITC-Eats-Teamproject3
+spring boot 프로젝트
